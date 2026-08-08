@@ -1,7 +1,7 @@
 {
   "name": "bold",
   "fontName": "CJK Bold",
-  "firstGlyph": 64,
+  "firstGlyph": 80,
   "glyphCount": 16,
   "characters": 13,
   "firstSlot": 1,
@@ -9,7 +9,7 @@
     {
       "slot": 1,
       "tileset": "bold_0",
-      "firstGlyph": 64,
+      "firstGlyph": 80,
       "cells": 16
     }
   ],

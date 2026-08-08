@@ -134,6 +134,43 @@
         "__section": "text"
       },
       "id": "dca9073d-4ae8-4d95-ba84-4a6e3b1520d9"
+    },
+    {
+      "command": "EVENT_GTX_MENU",
+      "args": {
+        "variable": "0",
+        "items": 3,
+        "option1": "剑",
+        "option2": "盾",
+        "option3": "药",
+        "layout": "full",
+        "cancelOnLastOption": false,
+        "cancelOnB": true,
+        "__collapse": true
+      },
+      "id": "2d3a034e-d027-4793-a44e-9ff964f03108"
+    },
+    {
+      "command": "EVENT_GTX_DISPLAY_DIALOGUE",
+      "args": {
+        "minHeight": 6,
+        "maxHeight": 8,
+        "textX": 1,
+        "textY": 1,
+        "textHeight": 4,
+        "position": "bottom",
+        "clearPrevious": true,
+        "showFrame": true,
+        "speedIn": -1,
+        "speedOut": -1,
+        "closeWhen": "key",
+        "closeButton": "a",
+        "__section": "text",
+        "text": [
+          "!S5!选择存在变量里。\n按 B 键取消\n会得到零。\n按 A 关闭。"
+        ]
+      },
+      "id": "67ac952c-143a-401e-992d-2c6e70820176"
     }
   ],
   "playerHit1Script": [],

@@ -148,6 +148,10 @@ Keep off them if the same screen also uses the stock **Display Dialogue**, **Dis
 Text** or **Menu** events; those still compose into 204–255. The buffer's location is
 fixed in the engine, so it cannot be moved out of the way.
 
+Or remove the condition entirely: turning on
+[**Replace stock text rendering**](#replacing-the-stock-text-renderer) compiles that
+renderer out, and nothing is left that could write there.
+
 ### Tile placement on Game Boy Color
 
 On CGB, each tilemap cell can read its tile data from either VRAM bank, and the plugin
@@ -404,6 +408,8 @@ Found under **Settings → Glyph Text**.
 | **Glyph sheet slots** | 4 | How many sheets can be registered at once. 7 bytes of WRAM each. |
 | **Glyph sheet columns** | 16 | Characters per sheet image row. Must match what the tool generated. |
 | **Wide character lead byte** | 128 | Lowest byte value that starts a two-byte code. |
+| **Replace stock text rendering** | Off | Compiles GB Studio's own text renderer out and points the stock *Display Dialogue*, *Display Text* and *Menu* events at this plugin instead. Frees 1,629 B of ROM (1,965 B in Color mode) and tiles 204–255. [See below](#replacing-the-stock-text-renderer). |
+| **Menu cursor row** | Lower tile of the line | Which tile of a two-row menu line the cursor sits on. Lower is level with the baseline, upper reads as slightly raised. |
 
 Usable cache entries are `min(cache capacity, range size / 4)` — or
 `min(cache capacity, range size / 2)` with *Alternate bank 0/1*. With the cache disabled
@@ -448,6 +454,60 @@ the capacity setting drops out and the whole reserved range is used.
 - Compatible variants are included for use alongside **ContinuousScenePlugin** and
   **ScreenScrollPlugin**, and are selected automatically.
 
+### Replacing the stock text renderer
+
+GB Studio's own renderer normally sits in the ROM alongside this plugin's, even in a
+project where every visible string is drawn by the plugin. **Replace stock text
+rendering** removes it.
+
+With the setting on, the plugin ships a copy of the engine's `ui.c` whose text renderer
+is compiled out, and supplies `ui_draw_text_buffer_char` itself. Nothing calls the plugin
+explicitly — the stock engine's own `ui_update()` resolves to it, so everything that used
+to draw stock text now draws glyphs:
+
+| | |
+|---|---|
+| **Display Dialogue**, **Display Text** | render as 16×16 glyphs, without swapping in this plugin's events |
+| **Menu** | renders as glyphs, with the cursor rows corrected — see below |
+
+Two things you get back:
+
+- **1,629 bytes of ROM** (**1,965** in a Color build), measured on the module, minus 8
+  bytes for the forwarder. Plus 5 bytes of WRAM.
+- **Tiles 204–255.** They were the stock renderer's scratch buffer, which is why
+  [the reserved range](#the-reserved-tile-range) only claims them on the condition that
+  nothing on screen uses stock text. With the stock renderer gone there is nothing left
+  to collide with, and that condition disappears.
+
+**Menus work with or without the setting.** Two things are wrong with the stock Menu
+event once lines are two rows tall: its cursor steps one 8px row per option, falling a
+row further behind each time, and its window is sized at compile time for stock rows so
+the frame comes out half as tall as the text in it.
+
+The driver lives in this plugin as **`<prefix>_ui_run_menu`**, a copy of the stock one
+with the cursor stride as a parameter. Option *n* occupies rows `(n-1)*stride + 1` through
+`+ stride`, and which of them the cursor takes is the
+**Menu cursor row** setting: the lower tile sits level with the baseline, the upper one
+reads as slightly raised, and which suits depends on where your font puts its glyphs in
+the cell. At stride 1 there is only one row and both choices are the stock position. It is always compiled, under its own name, so:
+
+| | Menu driver used |
+|---|---|
+| this plugin’s **Menu** event | calls `<prefix>_ui_run_menu` directly, through a native |
+| stock **Menu** event, setting off | stock `ui_run_menu`, unchanged and still correct for stock text |
+| stock **Menu** event, setting on | `ui_run_menu` is rewired to `<prefix>_ui_run_menu` |
+
+The event calls the native rather than emitting `VM_CHOICE`, because that instruction
+always calls `ui_run_menu` — which is only this plugin’s when the setting is on. Going
+direct is what lets the event work either way. It also means no `.MENUITEM` table is
+emitted: the options are a single column, so the driver lays them out itself.
+
+With the setting off, the bundled `ui.c` is the engine's own file byte for byte, so it
+costs nothing and changes nothing — verified by stripping the guards and comparing. It
+does mean this plugin now overrides `ui.c`, so it cannot be combined with another plugin
+that overrides the same file unless one of them ships an `engineAlt` variant for the
+other; the ContinuousScene and ScreenScroll variants shipped here already do.
+
 ---
 
 ## Events Reference
@@ -464,6 +524,7 @@ All events appear under the **Dialogue** group in the script editor.
 | **Glyph Text: Set Tile Range** | Changes the reserved VRAM tile range and tile placement at runtime. |
 | **Glyph Text: Set Glyph Sheet** | Points a sheet slot at a tileset asset covering a run of glyph indices. |
 | **Glyph Text: Set Width Table** | Registers the table of advances that variable-width mode needs. |
+| **Glyph Text: Menu** | A menu sized and stepped for two-row lines, drawn with this plugin. Works with or without *Replace stock text rendering*. |
 
 ---
 
@@ -495,6 +556,7 @@ supplied by a **second font set**, since ark-pixel carries no hangul.
 | Ελληνικά | Greek, proportional | `cjk` |
 | 한글 | hangul, from an alternate font | `korean` |
 | Dialogue | all of them in one text, switching font mid-line for 한국어 | both |
+| Menu | three options, each drawn at its own width | `cjk` |
 
 The density is the point: *Пропорциональный* is 16 characters in **13 screen columns**
 (104px), where fixed-width 16px rendering would need 32. It ships with the reserved range
@@ -537,6 +599,10 @@ error: glyph indices 0-127 of "cjk" overlap "korean" (112-143).
 
 Hence `chars_cjk.txt`, holding just the characters not tagged to the Korean font. Any
 project mixing a script its main font cannot draw needs the same split.
+
+Every example ends with a **menu**, built from the plugin’s own Menu event: a window
+sized for two-row lines, a cursor that steps to match, and the chosen option left in the
+`Item_Id` variable (zero if B cancelled it).
 
 All four examples are redistributable: every one is generated from an OFL or CC0 font,
 and [`fonts/`](fonts/) carries each licence next to the file it covers.

@@ -619,7 +619,10 @@ const charsFromProject = (dir) => {
     if (Array.isArray(node)) { node.forEach(collect); return; }
     if (node && typeof node === "object") {
       for (const [k, v] of Object.entries(node)) {
-        if (k === "text" || k === "paragraph") collect(v);
+        // menu options are option1..option8, not text -- both the stock Menu
+        // event and this plugin's use those field names, and missing them
+        // leaves every menu entry drawn as a blank square
+        if (k === "text" || k === "paragraph" || /^option\d+$/.test(k)) collect(v);
         else if (typeof v === "object") collect(v);
       }
     }

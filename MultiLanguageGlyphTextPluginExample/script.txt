@@ -40,3 +40,15 @@ VWF 12px 混在
 中文 日本語 Ελληνικά
 한국어 Русский
 A でとじる
+
+# Menu
+中文 CJK
+Русский
+Ελληνικά
+
+# Menu result
+VWF menu: every
+option drawn at its
+own width.
+B cancels to zero.
+A でとじる

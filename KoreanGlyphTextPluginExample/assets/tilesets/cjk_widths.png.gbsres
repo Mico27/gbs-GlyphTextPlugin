@@ -4,8 +4,8 @@
   "name": "cjk_widths",
   "symbol": "tileset_cjk_widths",
   "width": 1,
-  "height": 9,
+  "height": 11,
   "imageWidth": 8,
-  "imageHeight": 72,
+  "imageHeight": 88,
   "filename": "cjk_widths.png"
 }

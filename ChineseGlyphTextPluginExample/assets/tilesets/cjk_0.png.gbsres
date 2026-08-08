@@ -4,8 +4,8 @@
   "name": "cjk_0",
   "symbol": "tileset_cjk_0",
   "width": 32,
-  "height": 6,
+  "height": 8,
   "imageWidth": 256,
-  "imageHeight": 48,
+  "imageHeight": 64,
   "filename": "cjk_0.png"
 }

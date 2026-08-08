@@ -25,6 +25,9 @@ void gtx_display_text_speed(SCRIPT_CTX * THIS) OLDCALL BANKED;
 UBYTE gtx_display_dialogue(void * THIS, UBYTE start, UWORD * stack_frame) OLDCALL BANKED;
 void gtx_reset_cache(SCRIPT_CTX * THIS) OLDCALL BANKED;
 void gtx_set_tile_range(SCRIPT_CTX * THIS) OLDCALL BANKED;
+UBYTE gtx_ui_run_menu(menu_item_t * start_item, UBYTE bank, UBYTE options,
+                       UBYTE count, UBYTE start_index, UBYTE pitch) BANKED;
+void gtx_menu(SCRIPT_CTX * THIS) OLDCALL BANKED;
 void gtx_set_glyph_sheet(SCRIPT_CTX * THIS) OLDCALL BANKED;
 void gtx_set_width_table(SCRIPT_CTX * THIS) OLDCALL BANKED;
 

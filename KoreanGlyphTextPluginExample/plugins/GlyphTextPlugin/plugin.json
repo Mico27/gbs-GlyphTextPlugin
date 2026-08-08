@@ -4,6 +4,6 @@
   "author": "Mico27",
   "version": "4.3.0",
   "gbsVersion": ">=4.3.0",
-  "description": "16x16 text for large scripts such as Chinese: each character is a 2x2 tile quad streamed to VRAM from glyph sheets, with an optional LRU tile-quad cache.",
+  "description": "plugin that renders 16×16 text — every character is a 2×2 quad of tiles streamed into VRAM as it is printed. Built for scripts that need large character sets and full-square glyphs. (ex: Chinese, Japanese kanji, Korean)",
   "url": "https://github.com/Mico27/gbs-GlyphTextPlugin"
 }

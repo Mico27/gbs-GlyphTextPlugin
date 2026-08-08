@@ -320,6 +320,43 @@
         "__section": "text"
       },
       "id": "e545d925-b1ad-4b4f-98bf-17776df9b2ee"
+    },
+    {
+      "command": "EVENT_GTX_MENU",
+      "args": {
+        "variable": "0",
+        "items": 3,
+        "option1": "中文 CJK",
+        "option2": "Русский",
+        "option3": "Ελληνικά",
+        "layout": "full",
+        "cancelOnLastOption": false,
+        "cancelOnB": true,
+        "__collapse": true
+      },
+      "id": "277cb896-15bc-4b08-9899-81e9127bf4d7"
+    },
+    {
+      "command": "EVENT_GTX_DISPLAY_DIALOGUE",
+      "args": {
+        "minHeight": 6,
+        "maxHeight": 8,
+        "textX": 1,
+        "textY": 1,
+        "textHeight": 4,
+        "position": "bottom",
+        "clearPrevious": true,
+        "showFrame": true,
+        "speedIn": -1,
+        "speedOut": -1,
+        "closeWhen": "key",
+        "closeButton": "a",
+        "__section": "text",
+        "text": [
+          "!S5!VWF menu: every\noption drawn at its\nown width.\nB cancels to zero.\nA でとじる"
+        ]
+      },
+      "id": "f1dab3af-975e-4b6a-8eb5-47f77d92a5a5"
     }
   ],
   "playerHit1Script": [],
