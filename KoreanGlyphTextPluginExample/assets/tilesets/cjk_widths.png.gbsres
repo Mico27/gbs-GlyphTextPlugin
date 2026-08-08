@@ -1,0 +1,11 @@
+{
+  "_resourceType": "tileset",
+  "id": "ced48e64-2e67-40ec-8db1-a26c6f4f3669",
+  "name": "cjk_widths",
+  "symbol": "tileset_cjk_widths",
+  "width": 1,
+  "height": 9,
+  "imageWidth": 8,
+  "imageHeight": 72,
+  "filename": "cjk_widths.png"
+}

@@ -1,0 +1,5 @@
+# Characters for the primary (Ark Pixel) font set of this example.
+# Generated from scene_1 by font tag: everything NOT tagged to the Korean
+# font. The generator's --project sweep is font-blind, so regenerating the
+# primary set from --project would pull hangul into a font that has none.
+ΑΓΕΠάήαγδεηικλμνοπςστυόώНПРавдежийклмнопрстуфцшыьがじでとなひへらるカグタダナフボリレン个中二件像十变可在変字宽幅度形按插文日本染次每混渲漢示素继续表語键

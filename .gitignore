@@ -1,0 +1,6 @@
+_gbsbuild/
+node_modules/
+*.gb
+*.pocket
+*.gbc
+*.bak

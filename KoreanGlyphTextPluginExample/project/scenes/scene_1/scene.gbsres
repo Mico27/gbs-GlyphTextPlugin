@@ -1,0 +1,164 @@
+{
+  "_resourceType": "scene",
+  "id": "a1355f17-85a1-4b2f-b0f4-66a0cb496e6e",
+  "_index": 0,
+  "name": "Scene 1",
+  "backgroundId": "dbe6b39e-356e-46de-a81e-f54d52926814",
+  "tilesetId": "",
+  "width": 20,
+  "height": 18,
+  "type": "TOPDOWN",
+  "colorModeOverride": "none",
+  "paletteIds": [],
+  "spritePaletteIds": [],
+  "collisions": "",
+  "autoFadeSpeed": null,
+  "symbol": "scene_1",
+  "x": 104,
+  "y": 32,
+  "script": [
+    {
+      "command": "EVENT_GTX_SET_GLYPH_SHEET",
+      "args": {
+        "slot": 0,
+        "firstGlyph": 0,
+        "clear": false,
+        "tilesetId": "2f83b6c1-90d4-4a57-8e12-6b0f75d3ac89",
+        "__collapse": true
+      },
+      "id": "9f2c4a11-7d38-4c6b-9a05-1e7b3d840cf2"
+    },
+    {
+      "command": "EVENT_GTX_SET_WIDTH_TABLE",
+      "args": {
+        "clear": false,
+        "tilesetId": "ced48e64-2e67-40ec-8db1-a26c6f4f3669",
+        "__collapse": true
+      },
+      "id": "3377a96b-5328-4be7-b65c-e9e7b08206c3"
+    },
+    {
+      "command": "EVENT_GTX_RESET_CACHE",
+      "args": {
+        "__collapse": true
+      },
+      "id": "b27ebb57-77be-4291-89f0-595aa2e013ab"
+    },
+    {
+      "command": "EVENT_SET_FONT",
+      "args": {
+        "fontId": "7c1e5a30-2b64-4f18-9d05-3ae61c8b7f42",
+        "__collapse": true
+      },
+      "id": "3a47fa80-af34-45a4-81f8-f64ed3fc1565"
+    },
+    {
+      "command": "EVENT_GTX_DISPLAY_TEXT_BKG",
+      "args": {
+        "text": "글리프 문자 표시\n한 글자 네 타일\n혼합 ABC 반각\nA 키로 계속",
+        "x": 1,
+        "y": 1,
+        "__comment": false,
+        "__collapse": true
+      },
+      "id": "4ce28239-707a-4b01-b184-ca0ca125ece7"
+    },
+    {
+      "command": "EVENT_FADE_IN",
+      "args": {
+        "speed": "2",
+        "__collapse": true
+      },
+      "id": "e8cca05f-6afc-434b-a9ed-33d526086f5d"
+    },
+    {
+      "command": "EVENT_AWAIT_INPUT",
+      "args": {
+        "input": [
+          "a"
+        ],
+        "__collapse": true
+      },
+      "id": "5631462c-4c80-476c-8e53-78c778674c4d"
+    },
+    {
+      "command": "EVENT_GBVM_SCRIPT",
+      "args": {
+        "script": "VM_CALL_NATIVE b_scroll_repaint, _scroll_repaint",
+        "__collapse": true
+      },
+      "id": "cd332813-5c39-4178-8ccd-84ac631f3ac2"
+    },
+    {
+      "command": "EVENT_IDLE",
+      "args": {
+        "__collapse": true
+      },
+      "id": "db2cf17b-e917-4db1-a92f-e22c2c1bb3f4"
+    },
+    {
+      "command": "EVENT_GTX_DISPLAY_TEXT_SPEED",
+      "args": {
+        "text": "!S3!이 줄은 속도대로\n한 자씩 나옵니다.\nA 나 B 로 빨리",
+        "layer": "background",
+        "x": 1,
+        "y": 1,
+        "__collapse": true
+      },
+      "id": "fb376bc0-1a62-43fc-9130-3473f245597f"
+    },
+    {
+      "command": "EVENT_AWAIT_INPUT",
+      "args": {
+        "input": [
+          "a"
+        ],
+        "__collapse": true
+      },
+      "id": "93dd00af-ba06-45bf-ab5c-55050502d9d9"
+    },
+    {
+      "command": "EVENT_GBVM_SCRIPT",
+      "args": {
+        "script": "VM_CALL_NATIVE b_scroll_repaint, _scroll_repaint",
+        "__collapse": true
+      },
+      "id": "0b202425-52cc-40f9-a42f-65f03e7d18fc"
+    },
+    {
+      "command": "EVENT_IDLE",
+      "args": {
+        "__collapse": true
+      },
+      "id": "e2b413c7-a6ef-434f-9ca1-a5173b760b8c"
+    },
+    {
+      "command": "EVENT_GTX_DISPLAY_DIALOGUE",
+      "args": {
+        "text": [
+          "!S5!글리프 문자\n플러그인입니다! 대화창은\n스크롤 한 줄은 두 타일.\nA 로 닫기."
+        ],
+        "minHeight": 6,
+        "maxHeight": 8,
+        "textX": 1,
+        "textY": 1,
+        "textHeight": 4,
+        "position": "bottom",
+        "clearPrevious": true,
+        "showFrame": true,
+        "speedIn": -1,
+        "speedOut": -1,
+        "closeWhen": "key",
+        "closeButton": "a",
+        "__section": "text",
+        "__collapse": false
+      },
+      "id": "dca9073d-4ae8-4d95-ba84-4a6e3b1520d9"
+    }
+  ],
+  "playerHit1Script": [],
+  "playerHit2Script": [],
+  "playerHit3Script": [],
+  "playerSpriteSheetId": "11b5452b-187c-43a3-afb1-a1f4f74ffda2",
+  "autoFadeEventCollapse": false
+}

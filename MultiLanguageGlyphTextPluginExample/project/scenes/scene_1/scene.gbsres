@@ -1,0 +1,330 @@
+{
+  "_resourceType": "scene",
+  "id": "a1355f17-85a1-4b2f-b0f4-66a0cb496e6e",
+  "_index": 0,
+  "name": "Scene 1",
+  "backgroundId": "dbe6b39e-356e-46de-a81e-f54d52926814",
+  "tilesetId": "",
+  "width": 20,
+  "height": 18,
+  "type": "TOPDOWN",
+  "colorModeOverride": "none",
+  "paletteIds": [],
+  "spritePaletteIds": [],
+  "collisions": "",
+  "autoFadeSpeed": null,
+  "symbol": "scene_1",
+  "x": 104,
+  "y": 32,
+  "script": [
+    {
+      "command": "EVENT_GTX_SET_GLYPH_SHEET",
+      "args": {
+        "slot": 0,
+        "firstGlyph": 0,
+        "clear": false,
+        "tilesetId": "d0f77530-9a46-4dbe-aa59-904653311bc1",
+        "__collapse": true
+      },
+      "id": "f65203de-c2ff-4a97-8482-8682e852b1d1"
+    },
+    {
+      "command": "EVENT_GTX_SET_GLYPH_SHEET",
+      "args": {
+        "slot": 1,
+        "firstGlyph": 112,
+        "clear": false,
+        "tilesetId": "5588f2ab-27a8-4515-a26c-bb71f5562d2e",
+        "__collapse": true
+      },
+      "id": "d01bb182-d03f-4abc-bed4-146ad3ca2047"
+    },
+    {
+      "command": "EVENT_GTX_SET_WIDTH_TABLE",
+      "args": {
+        "clear": false,
+        "tilesetId": "8cf9da53-a22c-4113-934e-67a3b4113078",
+        "__collapse": true
+      },
+      "id": "0eb3131b-b51d-4e89-8442-aca1040cf183"
+    },
+    {
+      "command": "EVENT_SET_FONT",
+      "args": {
+        "fontId": "0b398e56-921c-4e5c-9c7f-8c79007114dc",
+        "__collapse": true
+      },
+      "id": "719e8873-e632-40c9-bf9f-c92a69ee88bd"
+    },
+    {
+      "command": "EVENT_GTX_RESET_CACHE",
+      "args": {
+        "__collapse": true
+      },
+      "id": "26b86c91-ffbb-454b-bb4e-70ec32ad4b08"
+    },
+    {
+      "command": "EVENT_GTX_DISPLAY_TEXT_BKG",
+      "args": {
+        "text": "Glyph Text: VWF 12px\nProportional widths:\niiiii vs WWWWW\n.,;:!? 0123456789\nPress A",
+        "x": 1,
+        "y": 1,
+        "__comment": false
+      },
+      "id": "28a3f26f-a9b3-4843-b583-615a6d46f650"
+    },
+    {
+      "command": "EVENT_FADE_IN",
+      "args": {
+        "speed": "2",
+        "__collapse": true
+      },
+      "id": "6b26ffed-5a7b-473d-8da6-4eb2bf5d7063"
+    },
+    {
+      "command": "EVENT_AWAIT_INPUT",
+      "args": {
+        "input": [
+          "a"
+        ]
+      },
+      "id": "1ba854cb-425c-41c5-a978-b3e9bd23994a"
+    },
+    {
+      "command": "EVENT_GBVM_SCRIPT",
+      "args": {
+        "script": "VM_CALL_NATIVE b_scroll_repaint, _scroll_repaint"
+      },
+      "id": "9b4ae4d2-f07f-4794-b8ca-e28daf755416"
+    },
+    {
+      "command": "EVENT_IDLE",
+      "args": {},
+      "id": "8f03f5fb-60f4-4bd7-8f16-ff5275af07ca"
+    },
+    {
+      "command": "EVENT_GTX_RESET_CACHE",
+      "args": {
+        "__collapse": true
+      },
+      "id": "d4def337-203a-4330-a709-a883c91b99f7"
+    },
+    {
+      "command": "EVENT_GTX_DISPLAY_TEXT_BKG",
+      "args": {
+        "text": "字形文字插件\n可变宽度渲染\n每个字十二像素\n按 A 键继续",
+        "x": 1,
+        "y": 1,
+        "__comment": false
+      },
+      "id": "e97c46fe-200e-491b-8886-3900b44cd368"
+    },
+    {
+      "command": "EVENT_AWAIT_INPUT",
+      "args": {
+        "input": [
+          "a"
+        ]
+      },
+      "id": "2373f58a-59e5-4879-b3fe-9630e261d559"
+    },
+    {
+      "command": "EVENT_GBVM_SCRIPT",
+      "args": {
+        "script": "VM_CALL_NATIVE b_scroll_repaint, _scroll_repaint"
+      },
+      "id": "6e305f2a-7a07-478e-868d-65c1c61fd43f"
+    },
+    {
+      "command": "EVENT_IDLE",
+      "args": {},
+      "id": "10727eb4-eeb3-44fc-a33d-fc61f2d8efa5"
+    },
+    {
+      "command": "EVENT_GTX_RESET_CACHE",
+      "args": {
+        "__collapse": true
+      },
+      "id": "84b9f851-62eb-4533-a0d0-8d82f8c50168"
+    },
+    {
+      "command": "EVENT_GTX_DISPLAY_TEXT_BKG",
+      "args": {
+        "text": "グリフ文字表示\n可変幅レンダリング\nひらがなカタカナ漢字\nA ボタンで次へ",
+        "x": 1,
+        "y": 1,
+        "__comment": false
+      },
+      "id": "7ebf7d19-79c0-466f-8595-c597b7f230b4"
+    },
+    {
+      "command": "EVENT_AWAIT_INPUT",
+      "args": {
+        "input": [
+          "a"
+        ]
+      },
+      "id": "b74b544f-0f5c-424b-9a5e-ab8161168cd0"
+    },
+    {
+      "command": "EVENT_GBVM_SCRIPT",
+      "args": {
+        "script": "VM_CALL_NATIVE b_scroll_repaint, _scroll_repaint"
+      },
+      "id": "60e48499-9b48-4bbd-99a0-48dac34122b6"
+    },
+    {
+      "command": "EVENT_IDLE",
+      "args": {},
+      "id": "93d4047c-0217-4dc6-90a4-3b38e93afa13"
+    },
+    {
+      "command": "EVENT_GTX_RESET_CACHE",
+      "args": {
+        "__collapse": true
+      },
+      "id": "e7d3f588-5c98-4730-8e20-eb88e15095c8"
+    },
+    {
+      "command": "EVENT_GTX_DISPLAY_TEXT_BKG",
+      "args": {
+        "text": "Привет мир\nПропорциональный\nшрифт двенадцать\nНажмите A",
+        "x": 1,
+        "y": 1,
+        "__comment": false
+      },
+      "id": "da5d0ae4-b7bd-4171-a7cc-9e104a65181e"
+    },
+    {
+      "command": "EVENT_AWAIT_INPUT",
+      "args": {
+        "input": [
+          "a"
+        ]
+      },
+      "id": "68fb8642-1c05-4a1a-b231-f775281bca39"
+    },
+    {
+      "command": "EVENT_GBVM_SCRIPT",
+      "args": {
+        "script": "VM_CALL_NATIVE b_scroll_repaint, _scroll_repaint"
+      },
+      "id": "88724031-90ac-4475-9177-4b20c24c0065"
+    },
+    {
+      "command": "EVENT_IDLE",
+      "args": {},
+      "id": "1c88a36f-9ee8-4d8f-9bb8-3645038b4c89"
+    },
+    {
+      "command": "EVENT_GTX_RESET_CACHE",
+      "args": {
+        "__collapse": true
+      },
+      "id": "f9f695ce-4b15-439c-b24d-08d79573c6cd"
+    },
+    {
+      "command": "EVENT_GTX_DISPLAY_TEXT_BKG",
+      "args": {
+        "text": "Γειά σου κόσμε\nΑναλογικό πλάτος\nδώδεκα pixel\nΠατήστε A",
+        "x": 1,
+        "y": 1,
+        "__comment": false
+      },
+      "id": "d77942cd-c23f-4888-93d0-d37ed220736d"
+    },
+    {
+      "command": "EVENT_AWAIT_INPUT",
+      "args": {
+        "input": [
+          "a"
+        ]
+      },
+      "id": "2b6da8d2-7994-466c-a7f6-e468b29bd7b5"
+    },
+    {
+      "command": "EVENT_GBVM_SCRIPT",
+      "args": {
+        "script": "VM_CALL_NATIVE b_scroll_repaint, _scroll_repaint"
+      },
+      "id": "e8b7e478-c0a3-4084-a9aa-1afbc45a2ef0"
+    },
+    {
+      "command": "EVENT_IDLE",
+      "args": {},
+      "id": "e2afad7b-b2e4-48b4-a139-035b620caf9e"
+    },
+    {
+      "command": "EVENT_GTX_RESET_CACHE",
+      "args": {
+        "__collapse": true
+      },
+      "id": "e0caabbd-f77c-40aa-ba8c-02d1571fe092"
+    },
+    {
+      "command": "EVENT_GTX_RESET_CACHE",
+      "args": {
+        "__collapse": true
+      },
+      "id": "7af086a3-5d68-4528-b181-f55ff19825f3"
+    },
+    {
+      "command": "EVENT_GTX_DISPLAY_TEXT_BKG",
+      "args": {
+        "text": "!F:5f88ab85-9210-42b7-b060-cc88e64d8890!글리프 문자 표시\n가변 폭 한글 렌더링\n열두 픽셀 크기\nA 를 누르세요",
+        "x": 1,
+        "y": 1,
+        "__comment": false
+      },
+      "id": "cb9acf5f-af1a-44e8-aebe-a3ec38df2d7d"
+    },
+    {
+      "command": "EVENT_AWAIT_INPUT",
+      "args": {
+        "input": [
+          "a"
+        ]
+      },
+      "id": "c5ade995-06b3-457d-8732-93c990366e42"
+    },
+    {
+      "command": "EVENT_GBVM_SCRIPT",
+      "args": {
+        "script": "VM_CALL_NATIVE b_scroll_repaint, _scroll_repaint"
+      },
+      "id": "434db816-e52a-40c8-b3e7-081e339561a8"
+    },
+    {
+      "command": "EVENT_IDLE",
+      "args": {},
+      "id": "e1e723c7-038d-4715-8e57-8bc7b7f4a43c"
+    },
+    {
+      "command": "EVENT_GTX_DISPLAY_DIALOGUE",
+      "args": {
+        "text": [
+          "!S5!VWF 12px 混在\n中文 日本語 Ελληνικά\n!F:5f88ab85-9210-42b7-b060-cc88e64d8890!한국어!F:0b398e56-921c-4e5c-9c7f-8c79007114dc! Русский\nA でとじる"
+        ],
+        "minHeight": 6,
+        "maxHeight": 8,
+        "textX": 1,
+        "textY": 1,
+        "textHeight": 4,
+        "position": "bottom",
+        "clearPrevious": true,
+        "showFrame": true,
+        "speedIn": -1,
+        "speedOut": -1,
+        "closeWhen": "key",
+        "closeButton": "a",
+        "__section": "text"
+      },
+      "id": "e545d925-b1ad-4b4f-98bf-17776df9b2ee"
+    }
+  ],
+  "playerHit1Script": [],
+  "playerHit2Script": [],
+  "playerHit3Script": [],
+  "playerSpriteSheetId": "11b5452b-187c-43a3-afb1-a1f4f74ffda2",
+  "autoFadeEventCollapse": false
+}

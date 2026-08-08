@@ -1,0 +1,11 @@
+{
+  "_resourceType": "tileset",
+  "id": "9d0734f1-2fb5-4c96-8f06-018a823ca646",
+  "name": "bold_0",
+  "symbol": "tileset_bold_0",
+  "width": 32,
+  "height": 2,
+  "imageWidth": 256,
+  "imageHeight": 16,
+  "filename": "bold_0.png"
+}
