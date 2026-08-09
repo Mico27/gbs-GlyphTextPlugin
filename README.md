@@ -637,3 +637,16 @@ Measured from the plugin's own module in a DMG build of `ChineseGlyphTextPluginE
 - **ROM** above is the renderer only. Glyph sheets cost **64 bytes per character** on top
   of it — a 500-character script is about 32 KB, two ROM banks.
 - **SRAM**: not used.
+
+## Changelog
+
+Grouped by the date each change was merged into the official
+[gb-studio-plugins](https://github.com/gb-studio-dev/gb-studio-plugins) repository.
+
+Only bug fixes, new features and feature changes are listed. Engine version
+bumps, patch regeneration, packaging fixes and documentation edits are omitted.
+
+### 2026-08-08
+
+- Initial release: CJK 2x2-tile-quad text, with glyph sheets supplied as tileset assets and an optional LRU cache.
+- Menu support and a "replace stock UI" engine setting.
