@@ -47,8 +47,7 @@ A でとじる
 Ελληνικά
 
 # Menu result
-VWF menu: every
-option drawn at its
-own width.
-B cancels to zero.
+You chose %d$00$.
+Every option drawn
+at its own width.
 A でとじる

@@ -353,7 +353,7 @@
         "closeButton": "a",
         "__section": "text",
         "text": [
-          "!S5!VWF menu: every\noption drawn at its\nown width.\nB cancels to zero.\nA でとじる"
+          "!S5!You chose %d$00$.\nEvery option drawn\nat its own width.\nA でとじる"
         ]
       },
       "id": "f1dab3af-975e-4b6a-8eb5-47f77d92a5a5"
