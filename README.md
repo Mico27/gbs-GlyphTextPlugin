@@ -20,7 +20,9 @@ what a GB Studio font asset can hold.
 4. [Engine Settings](#engine-settings)
 5. [Size Limits and Restrictions](#size-limits-and-restrictions)
 6. [Events Reference](#events-reference)
-7. [Memory Footprint](#memory-footprint)
+7. [Media](#media)
+8. [Memory Footprint](#memory-footprint)
+9. [Changelog](#changelog)
 
 ---
 
