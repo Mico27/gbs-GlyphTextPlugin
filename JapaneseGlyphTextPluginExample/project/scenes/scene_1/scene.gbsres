@@ -18,26 +18,25 @@
   "y": 32,
   "script": [
     {
-      "command": "EVENT_GTX_SET_GLYPH_SHEET",
+      "command": "EVENT_GTX_ASSIGN_EXTENDED_FONTS",
       "args": {
-        "slot": 0,
-        "firstGlyph": 0,
-        "clear": false,
-        "tilesetId": "2f83b6c1-90d4-4a57-8e12-6b0f75d3ac89",
-        "__collapse": false
+        "mainFont": "b0d1f7a4-3e52-4c88-9a17-5f2c6d84e310",
+        "count": 1,
+        "font0": "521cc331-994e-4d13-a78e-09cbffd1f632",
+        "__collapse": true
       },
-      "id": "9f2c4a11-7d38-4c6b-9a05-1e7b3d840cf2"
+      "id": "1a2389ec-b468-4c82-a9c4-7064bc5a285f"
     },
     {
-      "command": "EVENT_GTX_SET_GLYPH_SHEET",
+      "command": "EVENT_GTX_ASSIGN_EXTENDED_FONTS",
       "args": {
-        "slot": 1,
-        "firstGlyph": 80,
-        "clear": false,
-        "tilesetId": "9d0734f1-2fb5-4c96-8f06-018a823ca646",
-        "__collapse": false
+        "mainFont": "7c1e5a30-2b64-4f18-9d05-3ae61c8b7f42",
+        "count": 2,
+        "font0": "0a0da5dd-89cc-44d2-9785-2780849c913c",
+        "font1": "50117139-6156-4443-ada6-7a18c863a5bc",
+        "__collapse": true
       },
-      "id": "5d3a91c6-84be-4f07-9b12-77ac0e6f3d51"
+      "id": "33ef629e-c52e-4ef6-89a0-3a955e3c35a7"
     },
     {
       "command": "EVENT_GTX_RESET_CACHE",

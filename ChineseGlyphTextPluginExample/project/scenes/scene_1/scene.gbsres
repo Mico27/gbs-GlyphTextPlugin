@@ -18,15 +18,15 @@
   "y": 32,
   "script": [
     {
-      "command": "EVENT_GTX_SET_GLYPH_SHEET",
+      "command": "EVENT_GTX_ASSIGN_EXTENDED_FONTS",
       "args": {
-        "slot": 0,
-        "firstGlyph": 0,
-        "clear": false,
-        "tilesetId": "2f83b6c1-90d4-4a57-8e12-6b0f75d3ac89",
+        "mainFont": "7c1e5a30-2b64-4f18-9d05-3ae61c8b7f42",
+        "count": 2,
+        "font0": "84080720-7d32-4d88-bded-12601f66bb76",
+        "font1": "9955c261-5669-49f3-8027-d8d1e6d15bbb",
         "__collapse": true
       },
-      "id": "9f2c4a11-7d38-4c6b-9a05-1e7b3d840cf2"
+      "id": "6fc46601-d635-43c7-9f81-502dad217687"
     },
     {
       "command": "EVENT_GTX_RESET_CACHE",

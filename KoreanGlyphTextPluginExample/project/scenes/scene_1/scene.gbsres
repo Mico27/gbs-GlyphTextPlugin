@@ -18,24 +18,15 @@
   "y": 32,
   "script": [
     {
-      "command": "EVENT_GTX_SET_GLYPH_SHEET",
+      "command": "EVENT_GTX_ASSIGN_EXTENDED_FONTS",
       "args": {
-        "slot": 0,
-        "firstGlyph": 0,
-        "clear": false,
-        "tilesetId": "2f83b6c1-90d4-4a57-8e12-6b0f75d3ac89",
+        "mainFont": "7c1e5a30-2b64-4f18-9d05-3ae61c8b7f42",
+        "count": 2,
+        "font0": "f5bc7841-18b5-419b-927a-3149d36befa4",
+        "font1": "832cc719-70d0-456f-9546-d5c5fb64d58e",
         "__collapse": true
       },
-      "id": "9f2c4a11-7d38-4c6b-9a05-1e7b3d840cf2"
-    },
-    {
-      "command": "EVENT_GTX_SET_WIDTH_TABLE",
-      "args": {
-        "clear": false,
-        "tilesetId": "ced48e64-2e67-40ec-8db1-a26c6f4f3669",
-        "__collapse": true
-      },
-      "id": "3377a96b-5328-4be7-b65c-e9e7b08206c3"
+      "id": "c9ceb35a-a90e-4d51-b8ec-326d768a18f2"
     },
     {
       "command": "EVENT_GTX_RESET_CACHE",

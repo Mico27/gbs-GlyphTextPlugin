@@ -34,22 +34,25 @@ A wide character is four 8×8 tiles arranged 2×2, so a line of text occupies **
 rows** and each character **two columns**. `\n` moves down a full two-row line; `\r`
 scrolls the text area by two rows.
 
-### Why glyph sheets, not font assets
+### Extended fonts
 
-GB Studio's font compiler stores **one byte per image tile** in a font's recode table, so
-a font asset can address at most **256 unique tiles** — 64 full-square glyphs. That is
-fine for Latin, useless for Chinese.
+A single GB Studio font cannot hold a Chinese script. Its compiler stores **one byte per
+image tile** in the recode table, so a font addresses at most **256 unique tiles** — and a
+full-square 16×16 glyph is four of them. That caps one font at **64 wide glyphs**.
 
-So wide characters come from a **glyph sheet** instead: an ordinary GB Studio **tileset**
-asset holding the 16×16 bitmaps in image order. Tilesets carry a 16-bit tile count and are
-addressed by offset, so one sheet holds up to **256 characters** (1024 tiles, one ROM
-bank), and several sheets can be registered at once — each covering one contiguous run of
-glyph indices. Four slots by default, up to sixteen.
+So a main font carries a **group of extended fonts**. Each is an ordinary font asset of up
+to 64 glyphs, and the wide codes run through the group in order: the first extended font
+covers codes 0–63, the next 64–127, and so on. One event assigns the group; the glyph
+codes are numbered per main font, so two main fonts in a project can never collide.
+
+They are ordinary font assets on purpose. You can open one in any editor, redraw a glyph,
+and — because GB Studio derives character widths from the image itself — respace it by
+moving the magenta, with no table to rebuild.
 
 ### Two character widths in one line
 
-- **Wide characters** — two bytes, both `≥ 0x80` — come from a glyph sheet and take a
-  full 16×16 square.
+- **Wide characters** — two bytes, both `≥ 0x80` — come from one of the current main
+  font's extended fonts and take a full 16×16 square.
 - **Narrow characters** — one byte, `0x20`–`0x7F` — come from the **current font asset**.
   By default they are **half width**: one 8×16 cell, two tiles, advancing one column, so
   Latin letters and digits mixed into a Chinese line stay readable instead of being
@@ -62,7 +65,8 @@ glyph indices. Four slots by default, up to sixteen.
 Either way the font compiler's automatic recode table is positional
 (`table[32 + imageTilePos]` = deduplicated tile index), so the renderer finds every
 quarter arithmetically and tile deduplication is resolved by the table itself — no `.json`
-`table` block needed.
+`table` block needed. Extended fonts are read the same way, which is why they are always
+16 glyphs to an image row.
 
 ### The two-byte encoding
 
@@ -75,7 +79,7 @@ trail = 0x80 + (glyph index & 0x7F)
 ```
 
 Glyph indices span **0–16383**, and neither byte can ever collide with a control code or
-with ASCII. `src/GlyphTextPlugin/tools/make_glyph_sheets.js` generates the sheets and that mapping together,
+with ASCII. `src/GlyphTextPlugin/tools/make_glyph_fonts.js` generates the sheets and that mapping together,
 so you never write it by hand.
 
 ### The character tile cache
@@ -118,13 +122,25 @@ Two things follow from that, and neither is optional:
   about 3.6 lines, which is enough because only two are ever visible. Widen it to
   64–255 for 96 columns if you draw more.
 
-A **width table** supplies the advances — a tileset asset the generator writes next to
-the sheets, registered once with **Glyph Text: Set Width Table**. Without one every
-character falls back to its full cell and you get fixed-width spacing again.
+**The advances come out of the font images themselves.** GB Studio's font compiler trims
+every 8×8 tile against transparency and records what is left as that tile's width, so
+painting **magenta** `(255,0,255)` to the right of a glyph is what sets its advance — and
+a font with no magenta anywhere is simply not variable width, so every glyph fills its
+cell. There is no width table to build or register.
 
-Single-byte characters always come from the 8×16 font grid here, whatever the
-half-width setting says. Glyph cells stay 2×2 tiles regardless of the font size, so a
-12px font simply leaves 4px of air that the width table steps over.
+Because the trim is per tile, a 16px glyph's advance is its two top tiles added together:
+a glyph inked to 11px leaves the left tile full at 8 and the right trimmed to 3.
+
+Two rules follow from how the trim works, and the generator obeys both:
+
+- **Magenta only ever goes to the right of a glyph.** The compiler trims leading
+  transparency too, so magenta on the left would *shift* the glyph rather than pad it.
+- **Glyphs are never centred in variable-width mode**, for the same reason.
+
+To respace a character, open the extended font and move the magenta. Nothing regenerates.
+
+Single-byte characters always come from the 8×16 font grid here, whatever the half-width
+setting says, and take their advances from the main font the same way.
 
 ### The reserved tile range
 
@@ -175,17 +191,18 @@ On DMG the plugin falls back to bank 0 automatically.
 
 Copy `src/GlyphTextPlugin` into your project's `plugins/` folder.
 
-### 2. Generate the sheets and the font
+### 2. Generate the fonts
 
 The generator ships **inside the plugin**, so it is now sitting in your project at
-`plugins/GlyphTextPlugin/tools/`. Double-click **`Make Glyph Sheets.bat`** there and give
+`plugins/GlyphTextPlugin/tools/`. Double-click **`Make Glyph Fonts.bat`** there and give
 it a font — it works out which project it belongs to from where it is installed, so that
 is the only thing it needs. (Dropping a `.ttf` onto it works too, as does naming a
 different project.)
 
-It reads **every character your project's text events already use**, and writes
-`assets/tilesets/cjk_0.png` (and `_1`, `_2`… as needed), `assets/fonts/cjk.png` and
-`assets/fonts/cjk.json` into the project, then prints the settings and events to add.
+It reads **every character your project's text events already use**, and writes the main
+font `assets/fonts/cjk.png`, its `assets/fonts/cjk.json` mapping, and one extended font
+per 64 wide characters — `cjk_ext0.png`, `cjk_ext1.png` and so on. Then it prints the
+settings and the event to add, naming the extended fonts in order.
 
 ### 3. Make the generated font the project's default font
 
@@ -195,11 +212,15 @@ It reads **every character your project's text events already use**, and writes
 compiled. Point Settings → Default Font at the generated font, or start each text with an
 inline `!F:…!` font token selecting it.
 
-### 4. Register the glyph sheets
+### 4. Assign the extended fonts
 
-Add one **Glyph Text: Set Glyph Sheet** per sheet to the first scene's **On Init**, with
-the slot and first-glyph values the tool printed. Registered sheets are global and survive
-scene changes, so this only has to happen once.
+Add one **Glyph Text: Assign Extended Fonts** to the first scene's **On Init**: pick the
+main font, say how many extended fonts it has, and choose them in the order the tool
+printed. Groups are global and survive scene changes, so this happens once per main font.
+
+The group belongs to the main font, so switching font — with **Set Font** or an inline
+`!F:…!` token — switches its extended fonts too. A project using a second main font just
+adds a second Assign event for it.
 
 ### 5. Reset the cache in every scene
 
@@ -214,17 +235,17 @@ Use the draw events for instant text, typed-out text, or a full dialogue box.
 
 ## The Generator Tool
 
-**`src/GlyphTextPlugin/tools/Make Glyph Sheets.bat`** is the front door: double-click it and it asks for the
+**`src/GlyphTextPlugin/tools/Make Glyph Fonts.bat`** is the front door: double-click it and it asks for the
 font and the project, or drop files onto it —
 
 ```
-"Make Glyph Sheets.bat" VonwaonBitmap-16px.ttf C:\Games\MyGame
+"Make Glyph Fonts.bat" VonwaonBitmap-16px.ttf C:\Games\MyGame
 ```
 
-It forwards anything else to `src/GlyphTextPlugin/tools/make_glyph_sheets.js`, which also runs on its own:
+It forwards anything else to `src/GlyphTextPlugin/tools/make_glyph_fonts.js`, which also runs on its own:
 
 ```bash
-node src/GlyphTextPlugin/tools/make_glyph_sheets.js --font pixelfont.ttf --project path/to/myGame --name cjk
+node src/GlyphTextPlugin/tools/make_glyph_fonts.js --font pixelfont.ttf --project path/to/myGame --name cjk
 ```
 
 ```
@@ -249,16 +270,12 @@ Output:
   --offset-x <n>          nudge rasterised glyphs horizontally, after the fit
   --offset-y <n>          nudge rasterised glyphs vertically, likewise
   --no-fit                keep whatever the rasteriser puts at the origin
-  --cols <n>              glyphs per sheet row, power of two (default: 16)
-  --per-sheet <n>         glyphs per sheet, multiple of cols (default: 192)
-  --first-glyph <n>       pin the first glyph index instead of allocating one
-  --first-slot <n>        pin the first sheet slot instead of allocating one
   --full-width-ascii      ASCII font uses 16x16 cells instead of 8x16
   --bold                  smear every glyph a pixel right, for a bitmap bold
   --vwf                   build for variable-width rendering: pack glyphs left
-                          and write a width table beside the sheets
+                          and cull margins painted into the font images
   --space-width <n>       pen advance for a space, in pixels (default 4, 1-16).
-                          Variable width only, and only on the set owning glyph 0
+                          Variable width only
   --no-font               keep your own font PNG; only rewrite <name>.json
   --wizard                ask for anything not given on the command line
   --help
@@ -320,40 +337,41 @@ decorative alternate that text switches to mid-sentence. Give the second set its
 `--name`:
 
 ```bash
-node src/GlyphTextPlugin/tools/make_glyph_sheets.js --font bold.ttf --project MyGame --name bold --font-name "Bold CJK"
+node src/GlyphTextPlugin/tools/make_glyph_fonts.js --font bold.ttf --project MyGame --name bold --font-name "Bold CJK"
 ```
 
 `--name` is the file prefix *and* the identity of the set; `--font-name` is only what GB
 Studio shows in the font picker, so you can keep short file names and readable labels.
 
-Wide glyph indices and sheet slots are **global to the plugin**, so two sets must not
-overlap in either. The tool handles that itself: each set leaves a small
-`<name>.glyphs.json` manifest next to its font, a new set is placed after everything
-already registered, and regenerating a set in place keeps its own position so the others
-never shift. Overlaps are refused with an error rather than written out. `--first-glyph` /
-`--first-slot` override the placement when you want to lay it out by hand.
+Wide glyph codes are numbered **per main font**, always from zero, so two sets can never
+collide and there is nothing to allocate between them. Each main font carries its own
+group of extended fonts, and each gets its own **Assign Extended Fonts** event.
 
 The report tells you which case you are in. For an alternate set it prints the `!F:…!`
 token that switches to it inside a text event, instead of telling you to make it the
 default font — only one font can be the default, and that is the one whose mapping GB
 Studio uses for text with no font token in it.
 
-Two things to keep in mind: every set needs its **own sheet slots** (raise *Glyph sheet
-slots* to cover them all), and all sets share the **one tile cache**, so widen the reserved
-tile range if two fonts are on screen at once.
+Two things to keep in mind: each main font needs a group slot of its own (raise *Font
+group slots* to cover them all), and every set shares the **one tile cache**, so widen the
+reserved tile range if two fonts are on screen at once.
+
+Because the group belongs to the font, an `!F:…!` token switches the extended fonts along
+with the main one — a bold run mid-sentence draws its wide characters from the bold set.
 
 ### Building for variable width
 
-Add `--vwf`. Glyphs are then packed to the left of their cell instead of centred, and
-a width table is written beside the sheets:
+Add `--vwf`. Glyphs are then packed to the left of their cell instead of centred, and the
+unused right-hand part of each cell is filled with **magenta** for the font compiler to
+trim:
 
 ```bash
-node src/GlyphTextPlugin/tools/make_glyph_sheets.js --font ark-pixel-12px-proportional.ttf \
+node src/GlyphTextPlugin/tools/make_glyph_fonts.js --font ark-pixel-12px-proportional.ttf \
      --size 12 --vwf --project MyGame
 ```
 
-`--size` is the size the glyphs are *drawn* at, not the cell: cells stay 2×2 tiles
-either way, so a 12px font leaves air the width table steps over.
+`--size` is the size the glyphs are *drawn* at, not the cell: cells stay 2×2 tiles either
+way, so a 12px font leaves 4px of magenta that the renderer steps over.
 
 Advances come from the font when it states them (a bitmap strike carries a real
 `horiAdvance`) and are measured from the ink plus a pixel of air when it does not —
@@ -365,30 +383,24 @@ out of the strike.
 **The space is the one advance that cannot be measured** — a blank glyph has no ink, so
 there is nothing to read a width from, and a font that states advances in a bitmap strike
 often gives its space a value drawn for a much larger cell. `--space-width` states it
-outright instead; it defaults to **4px**, which reads well at 12px. Zero is rejected
-rather than quietly rounded: the width table uses 0 to mean "no entry", so the engine
-would fall back to its own default instead of giving you a zero-width space.
-
-The table is shared by every font set in the project and is rebuilt from all of their
-manifests on each run, so adding a bold alternate does not invalidate it. Its ASCII
-block comes from whichever set owns glyph 0 — an alternate font with different Latin
-widths will use the primary's spacing for single-byte characters, `--space-width`
-included. Passing it to an alternate set warns and does nothing.
+outright instead; it defaults to **4px**, which reads well at 12px. It is painted as the
+space character's magenta margin in the main font, so it can be adjusted afterwards in an
+image editor like any other advance.
 
 ### Rerunning it
 
-Characters are sorted by codepoint and numbered from `--first-glyph`, so adding a line of
-dialogue and regenerating **renumbers every glyph**. The tool is built around that:
+Characters are sorted by codepoint and numbered from zero, so adding a line of dialogue
+and regenerating **renumbers every glyph**. The tool is built around that:
 
 - The `.gbsres` sidecars are written alongside each PNG, keeping the id and symbol of any
-  that already exist — so a sheet that changed size updates itself in the editor without
+  that already exist — so a font that changed size updates itself in the editor without
   breaking the scene references or your Default Font setting. (`--font-name` does rename
   the font, which is safe: references go by id.)
 - `mapping` in the `.json` is **replaced**, never merged. A leftover entry from an earlier
   run would still parse but quietly point at some other character's bitmap.
-- Only the number of *sheets* can change what you have to touch by hand: if a run reports
-  more sheets than before, add the extra Set Glyph Sheet events. The first-glyph values it
-  prints are always current.
+- Only the *number of extended fonts* can change what you have to touch by hand: if a run
+  reports more than before, raise the count on the Assign Extended Fonts event and pick
+  the new ones. Everything else is written for you.
 
 Characters the font does not cover are listed and left blank rather than silently skipped.
 
@@ -403,12 +415,11 @@ Found under **Settings → Glyph Text**.
 | **First VRAM tile reserved for 16x16 text** | 64 | First background tile index reserved for glyph quads. |
 | **Last VRAM tile reserved for 16x16 text** | 191 | Last reserved tile index, inclusive. |
 | **Tile placement (VRAM bank)** | Bank 0 only | Which VRAM tile data bank glyph quads go to. |
-| **Variable width glyphs (VWF)** | Off | Advance each character by its own width instead of a full cell. Compiles the cache out; needs a width table. |
+| **Variable width glyphs (VWF)** | Off | Advance each character by its own width instead of a full cell. Compiles the cache out; advances come from the magenta margins in the font images. |
 | **Half-width single-byte characters** | On | ASCII is 8×16 and advances one column. Off makes it 16×16. Ignored under VWF. |
 | **Enable character tile cache** | On | Keeps rendered quads in an LRU cache so repeated characters reuse them. |
 | **Character cache capacity (entries)** | 32 | How many characters the cache can track, 4–128. 4 bytes of WRAM each. |
-| **Glyph sheet slots** | 4 | How many sheets can be registered at once. 7 bytes of WRAM each. |
-| **Glyph sheet columns** | 16 | Characters per sheet image row. Must match what the tool generated. |
+| **Font group slots** | 4 | How many main fonts can carry a group of extended fonts at once. 4 bytes of WRAM each. |
 | **Wide character lead byte** | 128 | Lowest byte value that starts a two-byte code. |
 | **Replace stock text rendering** | Off | Compiles GB Studio's own text renderer out and points the stock *Display Dialogue*, *Display Text* and *Menu* events at this plugin instead. Frees 1,629 B of ROM (1,965 B in Color mode) and tiles 204–255. [See below](#replacing-the-stock-text-renderer). |
 | **Menu cursor row** | Lower tile of the line | Which tile of a two-row menu line the cursor sits on. Lower is level with the baseline, upper reads as slightly raised. |
@@ -423,7 +434,7 @@ the capacity setting drops out and the whole reserved range is used.
 
 - **A sheet must fit in one ROM bank**: 256 characters (1024 tiles, 16 KB). The tool
   defaults to 192 per sheet to leave the bank some slack. Split larger scripts over
-  several sheets and raise **Glyph sheet slots**.
+  several extended fonts and raise **Font group slots** if you add another main font.
 - **Glyph indices stop at 16383** — about 16 000 characters, far past what a Game Boy ROM
   can hold anyway.
 - **The reserved range must not collide** with your scene background tiles (0 upward), the
@@ -524,8 +535,7 @@ All events appear under the **Dialogue** group in the script editor.
 | **Glyph Text: Draw At Text Speed** | Types the text out at the current text speed on either layer. Blocks until done. |
 | **Glyph Text: Reset Tile Cache** | Forgets all cached glyph quads. Call this in each scene's On Init. |
 | **Glyph Text: Set Tile Range** | Changes the reserved VRAM tile range and tile placement at runtime. |
-| **Glyph Text: Set Glyph Sheet** | Points a sheet slot at a tileset asset covering a run of glyph indices. |
-| **Glyph Text: Set Width Table** | Registers the table of advances that variable-width mode needs. |
+| **Glyph Text: Assign Extended Fonts** | Gives a main font its group of extended fonts. Generates the group as ROM data at compile time. |
 | **Glyph Text: Menu** | A menu sized and stepped for two-row lines, drawn with this plugin. Works with or without *Replace stock text rendering*. |
 
 ---
@@ -570,34 +580,25 @@ their licences, so the examples rebuild from this repository alone. Run from the
 repository root:
 
 ```bash
-node src/GlyphTextPlugin/tools/make_glyph_sheets.js --font fonts/VonwaonBitmap-16px.ttf --project ChineseGlyphTextPluginExample
-node src/GlyphTextPlugin/tools/make_glyph_sheets.js --font fonts/VonwaonBitmap-16px.ttf --project JapaneseGlyphTextPluginExample --name cjk
-node src/GlyphTextPlugin/tools/make_glyph_sheets.js --font fonts/VonwaonBitmap-16px.ttf --bold --out JapaneseGlyphTextPluginExample      --text "太字出ます。プラグイン切替" --name bold
-node src/GlyphTextPlugin/tools/make_glyph_sheets.js --font fonts/Galmuri11.ttf --size 12 --vwf \
+node src/GlyphTextPlugin/tools/make_glyph_fonts.js --font fonts/VonwaonBitmap-16px.ttf --project ChineseGlyphTextPluginExample
+node src/GlyphTextPlugin/tools/make_glyph_fonts.js --font fonts/VonwaonBitmap-16px.ttf --project JapaneseGlyphTextPluginExample --name cjk
+node src/GlyphTextPlugin/tools/make_glyph_fonts.js --font fonts/VonwaonBitmap-16px.ttf --bold --out JapaneseGlyphTextPluginExample      --text "太字出ます。プラグイン切替" --name bold
+node src/GlyphTextPlugin/tools/make_glyph_fonts.js --font fonts/Galmuri11.ttf --size 12 --vwf \
      --project KoreanGlyphTextPluginExample --font-name "Galmuri11"
-node src/GlyphTextPlugin/tools/make_glyph_sheets.js --font fonts/Galmuri11.ttf --size 12 --vwf \
+node src/GlyphTextPlugin/tools/make_glyph_fonts.js --font fonts/Galmuri11.ttf --size 12 --vwf \
      --out MultiLanguageGlyphTextPluginExample --name korean --font-name "Galmuri11 Korean" \
      --text "글리프 문자 표시 가변 폭 한글 렌더링 열두 픽셀 크기 를 누르세요 한국어"
-node src/GlyphTextPlugin/tools/make_glyph_sheets.js --font fonts/ark-pixel-12px-proportional-zh_cn.ttf \
+node src/GlyphTextPlugin/tools/make_glyph_fonts.js --font fonts/ark-pixel-12px-proportional-zh_cn.ttf \
      --size 12 --vwf --out MultiLanguageGlyphTextPluginExample --name cjk \
      --chars MultiLanguageGlyphTextPluginExample/chars_cjk.txt --font-name "Ark Pixel 12px"
 ```
 
-**The order of the last two matters**, and the primary set cannot use `--project`.
-
-The width table is project-wide — every run rebuilds it from *all* of the manifests but
-writes it as `<name>_widths.png` — so whichever set is generated **last** owns the
-complete copy, and that is the one to register. Here that is `cjk`, so the scene keeps
-registering `cjk_widths` and the duplicate `korean_widths.png` is deleted.
+**The primary set cannot use `--project` here.**
 
 `--project` is **font-blind**: it sweeps every string in the project, with no idea which
 ones are tagged to another font. Once the Korean screen existed, regenerating `cjk` from
-`--project` pulled all 27 hangul into the ark-pixel set — which carries none of them —
-and the set grew until it collided with `korean`'s indices:
-
-```
-error: glyph indices 0-127 of "cjk" overlap "korean" (112-143).
-```
+`--project` swept all 27 hangul into the ark-pixel set — which carries none of them, so
+they would come out blank and the report would list every one as missing.
 
 Hence `chars_cjk.txt`, holding just the characters not tagged to the Korean font. Any
 project mixing a script its main font cannot draw needs the same split.
@@ -625,7 +626,7 @@ for its Korean screen.
 ## Memory Footprint
 
 Measured from the plugin's own module in a DMG build of `ChineseGlyphTextPluginExample`
-(GB Studio 4.3.0-e1, default engine settings: 32 cache entries, 4 sheet slots).
+(GB Studio 4.3.0-e1, default engine settings: 32 cache entries, 4 font group slots).
 
 | | Cost |
 |---|---|
@@ -634,10 +635,11 @@ Measured from the plugin's own module in a DMG build of `ChineseGlyphTextPluginE
 | Banked ROM | 2,889 bytes |
 
 - **WRAM** scales with two settings: **4 bytes per cache entry** (128 of the 176 at the
-  default 32 entries) and **7 bytes per glyph sheet slot** (28 at the default 4). Turning
+  default 32 entries) and **4 bytes per font group slot** (16 at the default 4). Turning
   the cache off reclaims the LRU tables entirely.
-- **ROM** above is the renderer only. Glyph sheets cost **64 bytes per character** on top
-  of it — a 500-character script is about 32 KB, two ROM banks.
+- **ROM** above is the renderer only. Extended fonts cost **64 bytes per character** on
+  top of it — a 500-character script is about 32 KB, two ROM banks, spread over eight
+  extended fonts.
 - **SRAM**: not used.
 
 ## Changelog
@@ -652,3 +654,9 @@ bumps, patch regeneration, packaging fixes and documentation edits are omitted.
 
 - Initial release: CJK 2x2-tile-quad text, with glyph sheets supplied as tileset assets and an optional LRU cache.
 - Menu support and a "replace stock UI" engine setting.
+- Wide glyphs now come from **extended font assets** grouped under a main font, replacing
+  the tileset glyph sheets. Switching font switches its extended fonts with it.
+- Variable-width advances are read from the font images themselves — magenta marks the
+  area to cull — so the width tileset and its event are gone.
+- *Set Glyph Sheet* and *Set Width Table* replaced by a single **Assign Extended Fonts**
+  event, which generates the group as ROM data at compile time.

@@ -36,10 +36,6 @@
     {
       "id": "gtx_last_tile",
       "value": 192
-    },
-    {
-      "id": "GTX_SHEET_MAX",
-      "value": 2
     }
   ]
 }
