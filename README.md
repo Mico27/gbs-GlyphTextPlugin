@@ -508,22 +508,6 @@ does mean this plugin now overrides `ui.c`, so it cannot be combined with anothe
 that overrides the same file unless one of them ships an `engineAlt` variant for the
 other; the ContinuousScene and ScreenScroll variants shipped here already do.
 
-
-### Showing a variable in text
-
-Text can print a variable’s value, and the examples do — the menu result line reports
-which option was chosen:
-
-```
-%d$00$     the value, as many digits as it needs
-%D3$00$    the value, padded to three digits
-```
-
-**The id is zero-padded to two digits.** `$00$` is global variable 0, `$01$` is variable 1.
-A bare `$0$` lexes without complaint but resolves to a “missing variable” placeholder that
-always reads 0, so a menu result would silently print zero however you answered. Check the
-compiled `.dw` line if you are unsure: it should name your variable, not a `..._LOCAL_...`.
-
 ---
 
 ## Events Reference
