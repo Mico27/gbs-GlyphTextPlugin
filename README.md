@@ -22,7 +22,8 @@ what a GB Studio font asset can hold.
 6. [Events Reference](#events-reference)
 7. [Media](#media)
 8. [Memory Footprint](#memory-footprint)
-9. [Changelog](#changelog)
+9. [Bank 0 (HOME) Usage](#bank-0-home-usage)
+10. [Changelog](#changelog)
 
 ---
 
@@ -623,24 +624,83 @@ for its Korean screen.
 
 ---
 
+<!-- SETTINGCOST:BEGIN -->
+### What each engine setting costs
+
+Every setting here changes what gets compiled. Figures are what you **get back by
+turning the setting off**; rows marked *off by default* show what turning it **on**
+costs instead, and sliders show the cost per step. A dash means that budget does not
+move.
+
+| Setting | Bank 0 | WRAM | Banked ROM |
+|---|---|---|---|
+| Variable width glyphs (VWF) *(off by default — cost of turning it on)* | — | +15 B | +551 B |
+| Half-width single-byte characters | — | — | **16 B** |
+| Enable character tile cache | — | **130 B** | **307 B** |
+| Character cache capacity (entries) *(slider 4–128, default 32)* | — | 4 B/step | — |
+| Font group slots *(slider 1–8, default 4)* | — | 4 B/step | — |
+| Wide character lead byte *(slider 128–255, default 128)* | — | — | — |
+| Replace stock text rendering *(off by default — cost of turning it on)* | — | −5 B | −1,959 B |
+| Menu cursor row → *Upper tile of the line* | — | — | — |
+
+Turning off every on-by-default switch above frees **130 B** of WRAM, **323 B** of banked ROM — the full
+span between this plugin at its fullest and stripped to nothing. Treat it as a
+ceiling rather than a recipe: you keep whatever your game actually uses.
+
+- **Character cache capacity (entries)**: going from 4 to 128 moves WRAM by +496 B.
+- **Font group slots**: going from 1 to 8 moves WRAM by +28 B.
+- **Wide character lead byte**: going from 128 to 255 moves banked ROM by −9 B.
+
+<details><summary>How these were measured</summary>
+
+GB Studio 4.3.0-e1. This plugin's `engine/src/**/*.c` was compiled with the
+toolchain and flags GB Studio itself uses (`lcc -msm83:gb -Wf--max-allocs-per-node 3000
+-DHUGE_TRACKER -DRUMBLE_ENABLE=0x08u`) against a merged include tree, and the SDCC object
+files' area records were read: `_HOME` is bank 0, `_DATA`/`_INITIALIZED`/`_BSS` are WRAM,
+and `_CODE*`/`_CONST`/`_LIT`/`_INITIALIZER` are banked ROM.
+
+Two caveats. Only this plugin's own engine sources are measured, so a setting that also
+changes a struct shared with stock engine files can move a few more bytes in files the
+plugin does not ship. And each setting is toggled on its own: a handful measure slightly
+*negative* because enabling their code lets the compiler drop a fallback path elsewhere,
+and settings that gate other settings only show their own contribution.
+
+</details>
+<!-- SETTINGCOST:END -->
+
 ## Memory Footprint
 
-Measured from the plugin's own module in a DMG build of `ChineseGlyphTextPluginExample`
-(GB Studio 4.3.0-e1, default engine settings: 32 cache entries, 4 font group slots).
+Measured against the stock GB Studio **4.3.0-e1** engine by `measure_plugin_memory.js` (per-file SDCC compile with GB Studio's own build flags, at default engine settings; report of 2026-08-13). Figures are this plugin's *delta* versus stock — a file that replaces a stock engine file counts only the difference, which is why a plugin can come out negative. Using the plugin's events additionally compiles a few bytes of GBVM script per call into your project's script banks, on top of the fixed cost below.
 
-| | Cost |
+| Budget | Cost |
 |---|---|
 | Bank 0 (HOME) | 0 bytes |
-| WRAM | 176 bytes |
-| Banked ROM | 2,889 bytes |
+| WRAM | +179 bytes |
+| Banked ROM | +3,893 bytes |
 
-- **WRAM** scales with two settings: **4 bytes per cache entry** (128 of the 176 at the
-  default 32 entries) and **4 bytes per font group slot** (16 at the default 4). Turning
-  the cache off reclaims the LRU tables entirely.
-- **ROM** above is the renderer only. Extended fonts cost **64 bytes per character** on
-  top of it — a 500-character script is about 32 KB, two ROM banks, spread over eight
-  extended fonts.
-- **SRAM**: not used.
+- **Bank 0:** nothing. Every function the plugin adds is compiled into a switchable ROM bank.
+- **WRAM:** 179 bytes at the default settings (32 cache entries, 4 font group slots). It scales with both: **4 bytes per cache entry** and **4 bytes per font group slot**. Turning the cache off reclaims the LRU tables entirely (130 bytes).
+- **Banked ROM:** 3,893 bytes for the renderer. Extended fonts cost **64 bytes per character** on top of it — a 500-character script is about 32 KB, two ROM banks, spread over eight extended fonts. Enabling *Replace stock text rendering* takes 1,959 bytes back off the figure, because the stock renderer stops being compiled in.
+- **Engine WRAM headroom:** a stock GB Studio 4.3.0 project leaves about **854 bytes** of WRAM free (usable engine WRAM is 7,776 bytes at 0xC0A0–0xDF00; the stock engine uses 6,922). With this plugin installed roughly **675 bytes** remain. That does not change with the number of global variables your project defines: the script memory array is a fixed 3,584 bytes at stock engine settings (VM_HEAP_SIZE + VM_MAX_CONTEXTS × VM_CONTEXT_STACK_SIZE = 768 + 16 × 64 words).
+- **SRAM:** not used.
+
+---
+
+<!-- BANK0:BEGIN -->
+## Bank 0 (HOME) Usage
+
+Bank 0 is the 16 KB non-switchable ROM bank that the GB Studio engine core,
+the interrupt handlers and the GBDK runtime all share. Banked ROM is cheap
+(add another bank), bank 0 is not, so it is usually the first thing a project
+runs out of.
+
+| | Bytes |
+|---|---|
+| Bank 0 used by this plugin | **0** |
+
+**This plugin costs nothing in bank 0.** Every one of its functions is compiled
+into a switchable ROM bank; nothing it adds is resident in bank 0.
+<!-- BANK0:END -->
 
 ## Changelog
 
